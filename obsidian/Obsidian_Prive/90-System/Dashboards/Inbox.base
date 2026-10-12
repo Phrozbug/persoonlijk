@@ -1,0 +1,89 @@
+# Inbox.base
+# Wat er in 00-Inbox ligt, gesplitst naar herkomst, nieuwste eerst.
+# "Te verwerken" is wat jij of HAL echt moet wegzetten; de drie bronmappen
+# (Apple-Notities, Voice, Bijlagen) zijn aanvoer die je per week leegt.
+
+filters:
+  and:
+    - file.inFolder("00-Inbox")
+    - file.ext == "md"
+
+formulas:
+  bron: 'if(file.inFolder("00-Inbox/Apple-Notities"), "Apple", if(file.inFolder("00-Inbox/Voice"), "Spraak", if(file.inFolder("00-Inbox/Bijlagen"), "Bijlage", "Los")))'
+  dagen: 'file.mtime.relative()'
+
+properties:
+  file.name:
+    displayName: Notitie
+  formula.bron:
+    displayName: Bron
+  formula.dagen:
+    displayName: Binnen sinds
+  file.mtime:
+    displayName: Binnengekomen
+
+views:
+  - type: table
+    name: Te verwerken
+    filters:
+      and:
+        - formula.bron == "Los"
+    order:
+      - file.name
+      - formula.dagen
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Apple-Notities
+    filters:
+      and:
+        - formula.bron == "Apple"
+    limit: 50
+    order:
+      - file.name
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Spraak
+    filters:
+      and:
+        - formula.bron == "Spraak"
+    limit: 50
+    order:
+      - file.name
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Bijlagen
+    filters:
+      and:
+        - formula.bron == "Bijlage"
+    limit: 50
+    order:
+      - file.name
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Ouder dan 14 dagen
+    filters:
+      and:
+        - 'file.mtime < now() - "14d"'
+    order:
+      - file.name
+      - formula.bron
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: ASC

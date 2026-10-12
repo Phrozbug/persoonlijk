@@ -1,0 +1,62 @@
+# Opdrachten.base
+# Alle CC-opdrachten voor HAL en de terminal-Claude, op status.
+# Status komt uit de frontmatter (`status: open` / `klaar` / `uitgevoerd` / `mislukt`).
+
+filters:
+  and:
+    - file.name.startsWith("CC-Opdracht")
+    - '!file.inFolder("99-Archive")'
+
+formulas:
+  dagen: 'file.mtime.relative()'
+
+properties:
+  file.name:
+    displayName: Opdracht
+  status:
+    displayName: Status
+  created:
+    displayName: Aangemaakt
+  formula.dagen:
+    displayName: Laatst bewerkt
+  file.folder:
+    displayName: Map
+
+views:
+  - type: table
+    name: Open
+    filters:
+      or:
+        - status == "open"
+        - status.isEmpty()
+    order:
+      - file.name
+      - status
+      - created
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: list
+    name: Op status
+    groupBy:
+      property: status
+      direction: ASC
+    order:
+      - file.name
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Alles
+    order:
+      - file.name
+      - status
+      - created
+      - file.folder
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC

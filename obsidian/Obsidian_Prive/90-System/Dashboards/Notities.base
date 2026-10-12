@@ -1,0 +1,150 @@
+# Notities.base
+# Alle inhoudelijke notities in Obsidian_Prive, zonder ruis.
+# Ruis = archief, chatlogs van HAL, spraakopnames, OCR-bijlagen, dagnotities, copilot-gesprekken.
+# De kolom "Gebied" wordt afgeleid uit de topmap, dus dit werkt zonder dat je eerst
+# properties hoeft toe te voegen. Vul je later `gebied:` in de frontmatter in, dan wint die.
+
+filters:
+  and:
+    - file.ext == "md"
+    - '!file.inFolder("99-Archive")'
+    - '!file.inFolder("90-System/HAL/Gesprekken")'
+    - '!file.inFolder("00-Inbox/Voice")'
+    - '!file.inFolder("00-Inbox/Bijlagen")'
+    - '!file.inFolder("01-Daily")'
+    - '!file.inFolder("copilot")'
+    - '!file.inFolder("80-Referentie/Marketing-Digest")'
+    - 'file.name != "00-Start"'
+    - 'file.name != "Krantenkoppen"'
+
+formulas:
+  gebied: 'if(file.inFolder("30-Frankrijk/Huis-Kopen") || file.inFolder("20-Persoonlijk/Projecten") || file.folder.startsWith("10-"), "Werk", if(file.folder.startsWith("20-"), "Privé", if(file.folder.startsWith("30-"), "Frankrijk", if(file.folder.startsWith("80-"), "Naslag", if(file.folder.startsWith("00-"), "Inbox", "Systeem")))))'
+  map: 'file.folder'
+  dagen: 'file.mtime.relative()'
+
+properties:
+  file.name:
+    displayName: Notitie
+  formula.gebied:
+    displayName: Gebied
+  formula.map:
+    displayName: Map
+  formula.dagen:
+    displayName: Gewijzigd (relatief)
+  type:
+    displayName: Soort
+  status:
+    displayName: Status
+  project:
+    displayName: Project
+  file.mtime:
+    displayName: Gewijzigd
+
+views:
+  - type: table
+    name: Recent
+    limit: 15
+    order:
+      - file.name
+      - formula.gebied
+      - formula.map
+      - formula.dagen
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Werk
+    filters:
+      or:
+        - file.inFolder("10-Be-Responsible")
+        - file.inFolder("30-Frankrijk/Huis-Kopen")
+        - file.inFolder("20-Persoonlijk/Projecten")
+        - gebied == "werk"
+    order:
+      - file.name
+      - formula.map
+      - type
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Privé
+    filters:
+      and:
+        - '!file.inFolder("20-Persoonlijk/Projecten")'
+        - or:
+            - file.inFolder("20-Persoonlijk")
+            - file.inFolder("02-Lijsten")
+            - gebied == "prive"
+    order:
+      - file.name
+      - formula.map
+      - type
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Frankrijk
+    filters:
+      and:
+        - '!file.inFolder("30-Frankrijk/Huis-Kopen")'
+        - or:
+            - file.inFolder("30-Frankrijk")
+            - gebied == "frankrijk"
+    order:
+      - file.name
+      - formula.map
+      - type
+      - status
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Favorieten
+    filters:
+      and:
+        - fav == true
+    order:
+      - file.name
+      - formula.gebied
+      - formula.map
+      - file.mtime
+    sort:
+      - property: formula.gebied
+        direction: ASC
+      - property: file.name
+        direction: ASC
+
+  - type: list
+    name: Per gebied
+    groupBy:
+      property: formula.gebied
+      direction: ASC
+    order:
+      - file.name
+    sort:
+      - property: file.mtime
+        direction: DESC
+
+  - type: table
+    name: Alles
+    order:
+      - file.name
+      - formula.gebied
+      - formula.map
+      - type
+      - status
+      - project
+      - file.mtime
+    sort:
+      - property: file.mtime
+        direction: DESC

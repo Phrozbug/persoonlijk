@@ -1,0 +1,103 @@
+# Projecten.base
+# Eén projectkaart per lopend project (template: 90-System/Templates/Projectkaart.md).
+# Een projectkaart is een notitie met `type: project` in de frontmatter, waar hij ook staat.
+# Status-waarden: actief · wacht · idee · klaar
+
+filters:
+  and:
+    - type == "project"
+    - '!file.inFolder("99-Archive")'
+
+formulas:
+  gebied: 'if(!gebied.isEmpty(), gebied, if(file.inFolder("30-Frankrijk/Huis-Kopen") || file.inFolder("20-Persoonlijk/Projecten") || file.folder.startsWith("10-"), "werk", if(file.folder.startsWith("20-"), "prive", if(file.folder.startsWith("30-"), "frankrijk", "systeem"))))'
+  dagen_stil: 'file.mtime.relative()'
+
+properties:
+  file.name:
+    displayName: Project
+  formula.gebied:
+    displayName: Gebied
+  status:
+    displayName: Status
+  volgende_stap:
+    displayName: Volgende stap
+  deadline:
+    displayName: Deadline
+  formula.dagen_stil:
+    displayName: Laatst bewerkt
+  file.mtime:
+    displayName: Gewijzigd
+
+views:
+  - type: table
+    name: Actief
+    filters:
+      and:
+        - status == "actief"
+    order:
+      - file.name
+      - formula.gebied
+      - volgende_stap
+      - deadline
+      - formula.dagen_stil
+    sort:
+      - property: deadline
+        direction: ASC
+      - property: file.mtime
+        direction: DESC
+
+  - type: kanban
+    name: Bord
+    groupBy:
+      property: status
+      direction: ASC
+    groupOrder:
+      - idee
+      - actief
+      - wacht
+      - klaar
+    order:
+      - file.name
+      - formula.gebied
+      - volgende_stap
+      - deadline
+
+  - type: table
+    name: Werk
+    filters:
+      and:
+        - formula.gebied == "werk"
+        - status != "klaar"
+    order:
+      - file.name
+      - status
+      - volgende_stap
+      - deadline
+
+  - type: table
+    name: Privé en Frankrijk
+    filters:
+      and:
+        - formula.gebied != "werk"
+        - status != "klaar"
+    order:
+      - file.name
+      - formula.gebied
+      - status
+      - volgende_stap
+      - deadline
+
+  - type: table
+    name: Alles
+    order:
+      - file.name
+      - formula.gebied
+      - status
+      - volgende_stap
+      - deadline
+      - file.mtime
+    sort:
+      - property: status
+        direction: ASC
+      - property: file.mtime
+        direction: DESC

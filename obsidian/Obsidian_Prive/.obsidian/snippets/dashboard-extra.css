@@ -1,0 +1,42 @@
+/* dashboard-extra.css
+   Aanvulling op mcl-dashboard.css voor de nieuwe startpagina.
+   Zet dit snippet aan via Instellingen > Uiterlijk > CSS-snippets. */
+
+/* Navigatiebalk bovenaan: geen callout-look, wel wat lucht */
+.callout[data-callout="nav"] {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 10px 16px;
+}
+.callout[data-callout="nav"] > .callout-title { display: none; }
+.callout[data-callout="nav"] .callout-content p { margin: 4px 0; }
+
+/* Kaarten op de startpagina */
+.callout[data-callout="today"],
+.callout[data-callout="werk"],
+.callout[data-callout="prive"] {
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.callout[data-callout="today"] > .callout-title { color: var(--color-green); }
+.callout[data-callout="werk"]  > .callout-title { color: var(--color-blue); }
+.callout[data-callout="prive"] > .callout-title { color: var(--color-orange); }
+
+/* Ingesloten Bases: compacter en niet eindeloos hoog */
+.dashboard .bases-embed,
+.dashboard .internal-embed[src$=".base"],
+.dashboard .internal-embed[src*=".base#"] {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 6px;
+}
+.dashboard .bases-table { font-size: 0.9em; }
+
+/* Todoist-blok: zelfde maat als de Tasks-lijst */
+.dashboard .todoist-query { font-size: 0.92em; }
